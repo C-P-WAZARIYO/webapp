@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api/axios";
 import "../styles/BlogFeed.css";
 import { Link } from "react-router-dom";
 
@@ -176,9 +176,10 @@ const BlogFeed = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await axios.get("/api/posts");
-        if (Array.isArray(res.data) && res.data.length) {
-          setBlogs(res.data);
+        const res = await API.get('/blogs/published');
+        const posts = res.data?.data;
+        if (Array.isArray(posts) && posts.length) {
+          setBlogs(posts);
           setIsDemo(false);
         } else {
           setBlogs(demoBlogs);

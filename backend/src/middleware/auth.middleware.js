@@ -120,7 +120,34 @@ const optionalAuth = async (req, res, next) => {
   }
 };
 
+/**
+ * Authorization middleware - Check if user has required roles
+ * @param {string[]} allowedRoles - Array of role names
+ */
+const authorize = (allowedRoles = []) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return next(AppError.unauthorized('Authentication required', 'AUTH_REQUIRED'));
+    }
+
+    const userRoles = req.user.roles?.map((r) => r.role.name) || [];
+    const hasRole = allowedRoles.some((role) => userRoles.includes(role));
+
+    if (!hasRole) {
+      return next(
+        AppError.forbidden(
+          `Access denied. Required role(s): ${allowedRoles.join(', ')}`,
+          'INSUFFICIENT_ROLE'
+        )
+      );
+    }
+
+    next();
+  };
+};
+
 module.exports = {
   authenticate,
   optionalAuth,
+  authorize,
 };

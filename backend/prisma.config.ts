@@ -1,13 +1,17 @@
 import { defineConfig } from '@prisma/config';
 import * as dotenv from 'dotenv';
 
-// 1. Manually load the .env file
+// Load environment variables from .env
 dotenv.config();
 
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is not defined in your .env file');
+}
+
 export default defineConfig({
-  schema: "prisma/schema.prisma",
   datasource: {
-    // 2. Now this will correctly find your connection string
-    url: process.env.DATABASE_URL,
+    url: databaseUrl,
   },
 });

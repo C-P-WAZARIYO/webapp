@@ -14,11 +14,11 @@ const AppError = require('../utils/AppError');
  * Register a new user with Argon2id
  */
 const register = async (userData, metadata = {}) => {
-  const { email, username, password, firstName, lastName } = userData;
+  const { email, username, password, firstName, lastName, phone, emp_id } = userData;
 
   // Check if user already exists
   const existingUser = await prisma.user.findFirst({
-    where: { OR: [{ email }, { username }] },
+    where: { OR: [{ email }, { username }, { phone }] },
   });
 
   if (existingUser) {
@@ -31,24 +31,21 @@ const register = async (userData, metadata = {}) => {
   // 1. Argon2id Hashing
   const hashedPassword = await argon2.hash(password, { type: argon2.argon2id });
 
-  // 2. Atomic Transaction for User + Role Assignment
+  // 2. Atomic Transaction for User Creation (NO role assigned)
   const user = await prisma.$transaction(async (tx) => {
     const newUser = await tx.user.create({
       data: {
         email,
         username,
+        phone,
         password: hashedPassword,
         firstName: firstName || null,
         lastName: lastName || null,
+        emp_id: emp_id || null,
       },
     });
 
-    const defaultRole = await tx.role.findFirst({ where: { isDefault: true } });
-    if (defaultRole) {
-      await tx.userRole.create({
-        data: { userId: newUser.id, roleId: defaultRole.id },
-      });
-    }
+    // No role assigned - admin will assign later
     return newUser;
   });
 

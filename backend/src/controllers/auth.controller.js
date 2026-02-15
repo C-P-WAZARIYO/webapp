@@ -29,6 +29,9 @@ const setRefreshTokenCookie = (res, refreshToken) => {
     maxAge: config.cookie?.maxAge ?? 604800000,
   };
 
+  // Ensure cookie path matches auth routes so browser will send cookie to /api/v1/auth/refresh
+  cookieOptions.path = cookieOptions.path || `/api/${config.apiVersion}/auth`;
+
   res.cookie('refreshToken', refreshToken, cookieOptions);
 };
 
@@ -80,6 +83,16 @@ const register = async (req, res, next) => {
  */
 const login = async (req, res, next) => {
   try {
+    console.log('➡️ Login attempt received', {
+      path: req.originalUrl,
+      ip: req.ip,
+      body: req.body,
+      headers: {
+        origin: req.headers.origin,
+        cookie: req.headers.cookie,
+        authorization: req.headers.authorization && '[REDACTED]'
+      }
+    });
     const { email, username, password } = req.body;
     const metadata = getRequestMetadata(req);
 

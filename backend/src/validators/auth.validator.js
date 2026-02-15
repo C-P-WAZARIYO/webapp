@@ -42,6 +42,19 @@ const registerValidator = [
     .trim()
     .isLength({ max: 50 })
     .withMessage('Last name cannot exceed 50 characters'),
+
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone is required')
+    .matches(/^[0-9]{10}$/)
+    .withMessage('Phone must be a valid 10-digit number'),
+
+  body('emp_id')
+    .optional()
+    .trim()
+    .isLength({ max: 20 })
+    .withMessage('Employee ID cannot exceed 20 characters'),
 ];
 
 const loginValidator = [

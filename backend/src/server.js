@@ -7,7 +7,7 @@ const app = require('./app');
 const config = require('./config');
 const prisma = require('./config/database');
 
-const PORT = config.port || 3001;
+const PORT = config.port || 5000;
 
 const startServer = async () => {
   try {

@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const config = {
   env: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT, 10) || 3001,
+  port: parseInt(process.env.PORT, 10) || 5000,
   apiVersion: process.env.API_VERSION || 'v1',
 
   jwt: {
@@ -17,7 +17,9 @@ const config = {
   cookie: {
     secure: process.env.COOKIE_SECURE === 'true' || false,
     httpOnly: process.env.COOKIE_HTTP_ONLY !== 'false', // Defaults to true
-    sameSite: process.env.COOKIE_SAME_SITE || 'strict',
+    // Use 'lax' by default for local development to make XHR refresh requests more reliable.
+    // For production, consider 'none' with secure=true when using HTTPS and cross-site cookies.
+    sameSite: process.env.COOKIE_SAME_SITE || 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   },
   // Security: Argon2id Parameters
